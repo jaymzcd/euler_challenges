@@ -548,7 +548,6 @@ def problem_21():
         # actually be counted. Also we shouldn't count those values
         # that are equal to themselves - that's not a pair!
         if s <= target and sums[s - 1] == x and x != s:
-            # Our sum is within
             amicable_sum += x + s
 
     amicable_sum /= 2.0  # We've counted valid pairs twice by now
@@ -601,6 +600,53 @@ def problem_25():
         x0, x1 = x1, x0 + x1
         terms += 1
     print terms
+
+
+def problem_26():
+    """
+        A unit fraction contains 1 in the numerator. The decimal representation of the
+        unit fractions with denominators 2 to 10 are given:
+
+        1/2 =   0.5 1/3 =   0.(3) 1/4 =   0.25 1/5 =   0.2 1/6 =   0.1(6) 1/7 =
+        0.(142857) 1/8 =   0.125 1/9 =   0.(1) 1/10    =   0.1
+
+        Where 0.1(6) means 0.166666..., and has a 1-digit recurring cycle.
+        It can be seen that 1/7 has a 6-digit recurring cycle.
+
+        Find the value of d  1000 for which 1/d contains the longest recurring cycle
+        in its decimal fraction part.
+    """
+
+    # To solve this make use of a result from Number Theory, in particular Fermats
+    # Little Theorm. See http://en.wikipedia.org/wiki/Repeating_decimal#Fractions_with_prime_denominators
+    # for some detail on this. The key part is:
+    #
+    # A fraction in lowest terms with a prime denominator other than 2 or 5 (i.e.
+    # coprime to 10) always produces a repeating decimal. The period of the
+    # repeating decimal of 1/p is equal to the order of 10 modulo p. If 10 is a
+    # primitive root modulo p, the period is equal to p − 1; if not, the period is a
+    # factor of p − 1. This result can be deduced from Fermat's little theorem,
+    # which states that 10p−1 = 1 (mod p).
+
+    cycle_max_len = 0
+    max_digit = 0  # Will be the result for d
+
+    for d in range(2, 1000):
+        # Now solve 10^x mod d == 1, starting at 1
+        x = 1
+        while x < d:
+            # Check if the solution gives 1, then we're done
+            if 10 ** x % d == 1:
+                if x > cycle_max_len:
+                    # Reassign our current maxiumum record
+                    max_digit, cycle_max_len = d, x
+                # If the equation was solved we're done for this
+                # particular prime so can now move on
+                break
+            # Carry on til we get a solution... yay primes
+            x += 1
+
+    print max_digit
 
 
 if __name__ == '__main__':
