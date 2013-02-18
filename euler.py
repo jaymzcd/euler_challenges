@@ -2,7 +2,6 @@
 #!/usr/bin/env python2
 import sys
 import math
-import string
 
 from euler_helpers import *
 
@@ -427,7 +426,83 @@ def problem_17():
         British usage.
     """
 
-    pass
+    def english(num, answer_mode=True):
+        """
+            Takes a given number and returns the english phrase for it up to
+            1000. If answer_mode is True we return it without spaces so the
+            counts correspond to the question requirements.
+        """
+
+        def _clean(w):
+            # Helper to strip spaces out
+            if answer_mode:
+                return w.replace(' ', '')
+            else:
+                return w
+
+        phrase = ''  # Our return string
+
+        words = ('', 'one', 'two', 'three', 'four', 'five', 'six',
+            'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen',
+            'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen')
+
+        tens = ('', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty',
+            'seventy', 'eighty', 'ninety')
+
+        # Convert our number into a list of individual digits
+        digits = [int(x) for x in list(str(num))]
+
+        if num == 1000:
+            # CHEAT! onthe edge case :)
+            return _clean('one thousand')
+
+        # If we have a "special" number just return it straight away
+        if num < 20:
+            return _clean(words[num])
+
+        # Otherwise we need to build this up...
+        if num > 99:
+            # For numbers over 100 we'll need to write out the first bit
+            # and then take a look at the remainder. If we're dealing with
+            # special phrases we'll need to add that, otherwise we have
+            # one of the 'tens' words to prefix it with first
+            phrase += '%s hundred ' % words[digits[0]]
+
+            remainder = digits[1] * 10 + digits[2]
+            if remainder > 0:
+                if (remainder) < 20:
+                    phrase += 'and %s' % words[remainder]
+                else:
+                    phrase += 'and %s ' % tens[digits[1]]
+                    phrase += '%s ' % words[digits[2]]
+
+        else:
+            # Yeah, it's pretty much same as above. Indexes are difference
+            # since the length of digits differs by 1. There is probably
+            # some trickery to collapse all this into a line or two.
+            phrase = tens[digits[0]]
+            phrase += ' %s ' % words[digits[1]]
+
+        return _clean(phrase)
+
+    cnt = 0
+
+    for num in range(1, 1001):
+        cnt += len(english(num))
+
+    print cnt
+
+
+def problem_20():
+    """
+        n! means n  (n  1)  ...  3  2  1
+
+        For example, 10! = 10  9  ...  3  2  1 = 3628800,
+        and the sum of the digits in the number 10! is 3 + 6 + 2 + 8 + 8 + 0 + 0 = 27.
+
+        Find the sum of the digits in the number 100!
+    """
+    print sum([int(x) for x in list(str(math.factorial(100)))])
 
 
 def problem_22():
