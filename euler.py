@@ -505,6 +505,56 @@ def problem_20():
     print sum([int(x) for x in list(str(math.factorial(100)))])
 
 
+def problem_21():
+    """
+        Let d(n) be defined as the sum of proper divisors of n (numbers less than n
+        which divide evenly into n). If d(a) = b and d(b) = a, where a  b, then a and
+        b are an amicable pair and each of a and b are called amicable numbers.
+
+        For example, the proper divisors of 220 are 1, 2, 4, 5, 10, 11, 20, 22, 44, 55
+        and 110; therefore d(220) = 284. The proper divisors of 284 are 1, 2, 4, 71
+        and 142; so d(284) = 220.
+
+        Evaluate the sum of all the amicable numbers under 10000.
+    """
+
+    def factorize(x):
+        """
+            Returns all factors for number x up to x
+        """
+
+        if x == 0:
+            return []
+
+        lim = x ** 0.5  # Only need to go up to this
+        factors = []  # Init our list to return
+        for i in range(1, int(lim) + 1):
+            if x % i == 0:
+                factors.append(i)  # The main factor
+                factors.append(x / i)  # Add the 'inverse' factor
+
+        factors = list(set(factors))  # Get uniques, then tidy up
+        factors.sort()  # The set isn't always sorted
+        factors.pop(-1)  # Remove last one which is x itself
+
+        return factors
+
+    target = 10000  # Just to reference below more than once
+    amicable_sum = 0  # Init our actual answer now
+    # Now use the factorize function to get all sums up to 10,000
+    sums = map(lambda x: sum(factorize(x)), range(1, target))
+    for x, s in enumerate(sums, 1):
+        # Our sum is going to have to be under the target value to
+        # actually be counted. Also we shouldn't count those values
+        # that are equal to themselves - that's not a pair!
+        if s <= target and sums[s - 1] == x and x != s:
+            # Our sum is within
+            amicable_sum += x + s
+
+    amicable_sum /= 2.0  # We've counted valid pairs twice by now
+    print int(amicable_sum)
+
+
 def problem_22():
     """
         Using names.txt (right click and 'Save Link/Target As...'), a 46K text file
