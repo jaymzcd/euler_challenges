@@ -2,8 +2,10 @@
 #!/usr/bin/env python2
 import sys
 import math
+from datetime import datetime, timedelta
+from itertools import product
 from collections import Counter
-from euler_helpers import *
+from euler_helpers import is_prime, factorize, sieve
 
 
 def problem_1():
@@ -49,10 +51,10 @@ def problem_3():
 
     n = 600851475143
     upper_limit = int(math.sqrt(n))
-    sieve = range(1, upper_limit)
+    primes = range(1, upper_limit)
     factors = list()
 
-    for x in sieve:
+    for x in primes:
         if n % x == 0:
             factors.append(x)
 
@@ -493,6 +495,29 @@ def problem_17():
     print cnt
 
 
+def problem_19():
+    """
+        You are given the following information, but you may prefer to do some
+        research for yourself.
+
+            1 Jan 1900 was a Monday. Thirty days has September, April, June and
+              November. All the rest have thirty-one, Saving February alone, Which has
+              twenty-eight, rain or shine. And on leap years, twenty-nine. A leap year
+              occurs on any year evenly divisible by 4, but not on a century unless it
+              is divisible by 400.
+
+        How many Sundays fell on the first of the month during the twentieth century
+        (1 Jan 1901 to 31 Dec 2000)?
+    """
+
+    # Am not even going to try anything fancy and instead take a hammer to it and
+    # just count the matching sundays
+
+    date_conv = lambda x: datetime.strptime(x, '%Y-%m-%d')
+    dates = [date_conv('%d-%02d-01' % (y, m)) for y in range(1901, 2001) for m in range(1, 13)]
+    print len([day for day in dates if day.weekday() == 6])  # 6 is Sunday (0th based)
+
+
 def problem_20():
     """
         n! means n  (n  1)  ...  3  2  1
@@ -517,27 +542,6 @@ def problem_21():
 
         Evaluate the sum of all the amicable numbers under 10000.
     """
-
-    def factorize(x):
-        """
-            Returns all factors for number x up to x
-        """
-
-        if x == 0:
-            return []
-
-        lim = x ** 0.5  # Only need to go up to this
-        factors = []  # Init our list to return
-        for i in range(1, int(lim) + 1):
-            if x % i == 0:
-                factors.append(i)  # The main factor
-                factors.append(x / i)  # Add the 'inverse' factor
-
-        factors = list(set(factors))  # Get uniques, then tidy up
-        factors.sort()  # The set isn't always sorted
-        factors.pop(-1)  # Remove last one which is x itself
-
-        return factors
 
     target = 10000  # Just to reference below more than once
     amicable_sum = 0  # Init our actual answer now
@@ -586,6 +590,45 @@ def problem_22():
         total += count * score(name)
 
     print total
+
+
+def problem_23():
+    """
+        A perfect number is a number for which the sum of its proper divisors is
+        exactly equal to the number. For example, the sum of the proper divisors of 28
+        would be 1 + 2 + 4 + 7 + 14 = 28, which means that 28 is a perfect number.
+
+        A number n is called deficient if the sum of its proper divisors is less than
+        n and it is called abundant if this sum exceeds n.
+
+        As 12 is the smallest abundant number, 1 + 2 + 3 + 4 + 6 = 16, the smallest
+        number that can be written as the sum of two abundant numbers is 24. By
+        mathematical analysis, it can be shown that all integers greater than 28123
+        can be written as the sum of two abundant numbers. However, this upper limit
+        cannot be reduced any further by analysis even though it is known that the
+        greatest number that cannot be expressed as the sum of two abundant numbers is
+        less than this limit.
+
+        Find the sum of all the positive integers which cannot be written as the sum
+        of two abundant numbers.
+    """
+
+    MAX = 28123  # The most we'll have to go to will def. be less than this!
+
+    def abundants(x):
+        """
+            Returns generator of abundant numbers up to x
+        """
+        return (i for i in xrange(1, x) if sum(factorize(i)) > i)
+
+    # Generate a list of the abundant numbers, then rather than work out each
+    # number as it goes instead sum up all the abundants together, then we can
+    # check if a given number is present - if it is then it must be the sum
+    # of two abundants! Not all that thrilled with speed of this... assume
+    # there is some clever way or dynamic means to avoid some of the repeating.
+    # Profiling gives: 24734337 function calls in 10.024 seconds!!
+    two_sums = set((x + y for x, y in product(abundants(MAX), repeat=2) if x + y < MAX))
+    print sum([x for x in range(1, MAX) if x not in two_sums])
 
 
 def problem_25():

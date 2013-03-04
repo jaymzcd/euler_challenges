@@ -38,5 +38,28 @@ def sieve(n):
     return [p for p in primes if primes[p] == True and p > 1]
 
 
+def factorize(x):
+    """
+        Returns all factors for number x up to x
+    """
+
+    if x == 0:
+        return []
+
+    lim = x ** 0.5  # Only need to go up to this
+    factors = []  # Init our list to return
+    for i in range(1, int(lim) + 1):
+        if x % i == 0:
+            factors.append(i)  # The main factor
+            factors.append(x / i)  # Add the 'inverse' factor
+
+    factors = list(set(factors))  # Get uniques, then tidy up
+    factors.sort()  # The set isn't always sorted
+    factors.pop(-1)  # Remove last one which is x itself
+
+    return factors
+
+
 if __name__ == '__main__':
     pass
+
